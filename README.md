@@ -83,6 +83,7 @@ npm run build
 ## Simulación de QR
 
 La aplicación incluye un simulador de escaneo QR que genera diferentes tipos de resultados:
+
 - Tickets válidos
 - Tickets ya usados
 - Tickets inválidos
