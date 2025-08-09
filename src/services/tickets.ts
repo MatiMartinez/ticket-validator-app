@@ -2,19 +2,11 @@ import httpInstance from "./httpInstance";
 
 export const ticketService = {
   async validateEntry(input: string) {
-    const response = await httpInstance.post<ValidateEntryOutput>(
-      `/validate-entry`,
-      { token: input },
-      { headers: { "x-api-key": import.meta.env.VITE_SELF_API_KEY } }
-    );
+    const response = await httpInstance.post<ValidateEntryOutput>(`/validate-entry`, { token: input });
     return response.data;
   },
   async validateManualEntry(input: string) {
-    const response = await httpInstance.post<ValidateManualEntryOutput>(
-      `/validate-manual-entry`,
-      { ticketNumber: input },
-      { headers: { "x-api-key": import.meta.env.VITE_SELF_API_KEY } }
-    );
+    const response = await httpInstance.post<ValidateManualEntryOutput>(`/validate-manual-entry`, { ticketNumber: input });
     return response.data;
   },
 };
