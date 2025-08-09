@@ -1,25 +1,20 @@
 import { useState, useEffect } from "react";
 import { useDisclosure, useToast } from "@chakra-ui/react";
-import { useSearchParams } from "react-router-dom";
 import { Html5QrcodeScanner } from "html5-qrcode";
 import { useTicketValidation } from "./useTicketValidation";
 import { useQRDuplicatePrevention } from "./useQRDuplicatePrevention";
 
-export function useQRScanner() {
+export function useQRScannerOnly() {
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { validateTicket } = useTicketValidation();
   const { isDuplicate, markAsProcessed, clearHistory } = useQRDuplicatePrevention();
-  const [searchParams] = useSearchParams();
 
   const [isLoading, setIsLoading] = useState(false);
   const [qrResult, setQrResult] = useState<string | null>(null);
   const [validationStatus, setValidationStatus] = useState<string | null>(null);
-  const [ticketNumber, setTicketNumber] = useState<string | null>(null);
   const [isValidating, setIsValidating] = useState(false);
   const [scanner, setScanner] = useState<Html5QrcodeScanner | null>(null);
-  const [manualInput, setManualInput] = useState<string>("");
-  const [mode, setMode] = useState<'selection' | 'qr' | 'manual'>('selection');
 
   const createScanner = () => {
     return new Html5QrcodeScanner(
@@ -40,11 +35,6 @@ export function useQRScanner() {
   };
 
   useEffect(() => {
-    if (mode !== 'qr') {
-      setIsLoading(false);
-      return;
-    }
-
     setIsLoading(true);
     setQrResult(null);
 
@@ -63,7 +53,6 @@ export function useQRScanner() {
     }
 
     const newScanner = createScanner();
-
     setScanner(newScanner);
 
     newScanner.render(onScanSuccess, onScanFailure);
@@ -79,17 +68,7 @@ export function useQRScanner() {
           console.error("Error al limpiar el escáner:", err);
         });
     };
-  }, [mode]);
-
-  // Initialize mode from URL search params
-  useEffect(() => {
-    const modeParam = searchParams.get('mode');
-    if (modeParam === 'qr') {
-      setMode('qr');
-    } else if (modeParam === 'manual') {
-      setMode('manual');
-    }
-  }, [searchParams]);
+  }, []);
 
   const onScanSuccess = async (decodedText: string) => {
     // Verificar duplicados y estado de procesamiento
@@ -107,15 +86,13 @@ export function useQRScanner() {
     onOpen(); // Abrir modal inmediatamente para mostrar loading
 
     try {
-      // Validar el ticket y agregarlo al store
+      // Validar el ticket usando el servicio de QR (validateEntry)
       const result = await validateTicket(decodedText);
 
       setValidationStatus(result.status);
-      setTicketNumber(result.ticketNumber || null);
     } catch (error) {
-      console.error("Error durante la validación:", error);
+      console.error("Error durante la validación QR:", error);
       setValidationStatus("invalid");
-      setTicketNumber(null);
     } finally {
       setIsValidating(false);
     }
@@ -127,48 +104,11 @@ export function useQRScanner() {
     }
   };
 
-  const validateManualTicket = async () => {
-    if (!manualInput.trim()) {
-      toast({
-        title: "Error",
-        description: "Por favor ingresa un código de ticket",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-      return;
-    }
-
-    console.log("Ticket manual ingresado:", manualInput);
-
-    setQrResult(manualInput);
-    setIsValidating(true);
-    onOpen(); // Abrir modal inmediatamente para mostrar loading
-
-    try {
-      // Validar el ticket y agregarlo al store
-      const result = await validateTicket(manualInput);
-
-      setValidationStatus(result.status);
-      setTicketNumber(result.ticketNumber || null);
-    } catch (error) {
-      console.error("Error durante la validación manual:", error);
-      setValidationStatus("invalid");
-      setTicketNumber(null);
-    } finally {
-      setIsValidating(false);
-      setManualInput(""); // Limpiar input después de validar
-    }
-  };
-
-
   const handleClose = () => {
     onClose();
     setQrResult(null);
     setValidationStatus(null);
-    setTicketNumber(null);
     setIsValidating(false);
-    setManualInput("");
 
     // Limpiar historial de duplicados después de cerrar
     setTimeout(() => {
@@ -192,7 +132,6 @@ export function useQRScanner() {
     const html5QrcodeScanner = document.getElementById("qr-reader");
     if (html5QrcodeScanner) {
       const newScanner = createScanner();
-
       setScanner(newScanner);
 
       try {
@@ -223,15 +162,9 @@ export function useQRScanner() {
     isLoading,
     qrResult,
     validationStatus,
-    ticketNumber,
     isValidating,
     isOpen,
     handleClose,
     restartCamera,
-    // Mode management
-    mode,
-    validateManualTicket,
-    manualInput,
-    setManualInput,
   };
 }

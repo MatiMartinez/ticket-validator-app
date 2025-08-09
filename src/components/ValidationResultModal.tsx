@@ -9,25 +9,30 @@ import {
   VStack,
   Text,
   Box,
-  Badge,
   Icon,
   Spinner,
   Center,
 } from "@chakra-ui/react";
 import { useTicketStatus } from "../hooks/useTicketStatus";
 import { useValidationResultModal } from "../hooks/useValidationResultModal";
-import { getCurrentValidationDate } from "../utils/date";
 
 interface ValidationResultModalProps {
   isOpen: boolean;
   onClose: () => void;
   result: string;
   status: string | null;
-  ticketNumber?: string | null;
+  validationMessage?: string | null;
   isValidating: boolean;
 }
 
-export default function ValidationResultModal({ isOpen, onClose, result, status, ticketNumber, isValidating }: ValidationResultModalProps) {
+export default function ValidationResultModal({
+  isOpen,
+  onClose,
+  result,
+  status,
+  validationMessage,
+  isValidating,
+}: ValidationResultModalProps) {
   const { getStatusConfig } = useTicketStatus();
   const { shouldShowModal, shouldShowLoading } = useValidationResultModal({
     status,
@@ -80,35 +85,16 @@ export default function ValidationResultModal({ isOpen, onClose, result, status,
         <ModalBody py={4}>
           <VStack spacing={4} align="stretch">
             <VStack spacing={3} align="stretch">
-              {ticketNumber && (
+              {validationMessage && (
                 <Box>
                   <Text fontSize="xs" color="gray.500" mb={1}>
-                    Número de Ticket
+                    Mensaje
                   </Text>
-                  <Text fontFamily="mono" fontSize="sm" color="whiteAlpha.900" bg="gray.700" p={2} borderRadius="md">
-                    {ticketNumber}
+                  <Text fontSize="sm" color="whiteAlpha.900">
+                    {validationMessage}
                   </Text>
                 </Box>
               )}
-
-              <Box>
-                <Text fontSize="xs" color="gray.500" mb={1}>
-                  Estado
-                </Text>
-                <Badge colorScheme={config.color} variant="solid" display="flex" alignItems="center" gap={1} w="fit-content">
-                  <Icon as={config.icon} w={3} h={3} />
-                  {config.title}
-                </Badge>
-              </Box>
-
-              <Box>
-                <Text fontSize="xs" color="gray.500" mb={1}>
-                  Fecha de Validación
-                </Text>
-                <Text fontSize="sm" color="gray.300">
-                  {getCurrentValidationDate()}
-                </Text>
-              </Box>
 
               <Box>
                 <Text fontSize="xs" color="gray.500" mb={1}>

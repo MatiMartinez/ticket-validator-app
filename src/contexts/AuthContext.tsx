@@ -33,11 +33,21 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      if (username === "admin" && password === "admin") {
+      // Usuarios predefinidos
+      const users = [
+        { id: "1", username: "admin1", password: "admin123", name: "Administrador1" },
+        { id: "2", username: "admin2", password: "admin123", name: "Administrador2" },
+        { id: "3", username: "admin3", password: "admin123", name: "Administrador3" },
+        { id: "4", username: "admin4", password: "admin123", name: "Administrador4" },
+      ];
+
+      const foundUser = users.find((u) => u.username === username && u.password === password);
+
+      if (foundUser) {
         const userData: User = {
-          id: "1",
-          username: "admin",
-          name: "Admin",
+          id: foundUser.id,
+          username: foundUser.username,
+          name: foundUser.name,
         };
 
         setUser(userData);

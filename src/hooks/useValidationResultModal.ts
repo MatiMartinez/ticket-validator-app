@@ -12,7 +12,7 @@ export function useValidationResultModal({ status, isValidating, onClose }: UseV
     if (status === "valid" && !isValidating) {
       const timer = setTimeout(() => {
         onClose();
-      }, 5000);
+      }, 10000);
 
       return () => clearTimeout(timer);
     }

@@ -19,6 +19,5 @@ export interface ValidatedTicket {
   eventId: string;
   validatedAt: string;
   validatedBy: string;
-  qrData: string;
   status: "valid" | "invalid" | "already_used";
 }

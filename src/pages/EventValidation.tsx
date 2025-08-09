@@ -1,16 +1,18 @@
-import { Box, Container, VStack, Text, Button, Card, CardBody, Badge, Divider, Alert, AlertIcon, Spinner, Center } from "@chakra-ui/react";
-import { QrCode, History } from "lucide-react";
+import { Box, Container, VStack, Text, Card, CardBody, Badge, Divider, Alert, AlertIcon, Spinner, Center } from "@chakra-ui/react";
+import { History } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { useEvents } from "../hooks/useEvents";
 import { useEventValidation } from "../hooks/useEventValidation";
 import { useTicketStatus } from "../hooks/useTicketStatus";
 import Header from "../components/Header";
 import { formatDate } from "../utils/date";
+import QRValidatorButton from "../components/QRValidatorButton";
+import ManualValidatorButton from "../components/ManualValidatorButton";
 
 export default function EventValidation() {
   const { eventId } = useParams<{ eventId: string }>();
   const { getEventById, isLoading: eventsLoading } = useEvents();
-  const { validatedTickets, isLoading, error, handleStartValidator } = useEventValidation(eventId!);
+  const { validatedTickets, isLoading, error } = useEventValidation(eventId!);
   const { getStatusColor, getStatusIcon, getStatusText } = useTicketStatus();
 
   const event = getEventById(eventId!);
@@ -63,10 +65,11 @@ export default function EventValidation() {
 
       <Container maxW="md" py={6}>
         <VStack spacing={6} align="stretch">
-          {/* Botón para iniciar validador */}
-          <Button leftIcon={<QrCode size={20} />} colorScheme="brand" size="lg" h={16} onClick={handleStartValidator}>
-            Iniciar Validador
-          </Button>
+          {/* Botones para iniciar validadores */}
+          <VStack spacing={3} align="stretch">
+            <QRValidatorButton eventId={eventId!} />
+            <ManualValidatorButton eventId={eventId!} />
+          </VStack>
 
           {/* Historial */}
           <Card bg="gray.800" borderColor="gray.700">
@@ -118,12 +121,6 @@ export default function EventValidation() {
                             <Text fontSize="xs" color="gray.500">
                               {formatDate(ticket.validatedAt)}
                             </Text>
-
-                            {ticket.qrData && (
-                              <Text fontSize="xs" color="gray.400" fontFamily="mono" noOfLines={1}>
-                                QR: {ticket.qrData}
-                              </Text>
-                            )}
                           </VStack>
                         </Box>
 
