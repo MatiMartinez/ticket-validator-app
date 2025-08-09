@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { Box, Button, VStack, Text, Center, IconButton, Spinner } from "@chakra-ui/react";
+import { Box, Button, VStack, Text, Center, IconButton, Spinner, Input, HStack, Collapse } from "@chakra-ui/react";
 import { X } from "lucide-react";
 
 import { useQRScanner } from "../hooks/useQRScanner";
@@ -9,7 +9,21 @@ import ValidationResultModal from "../components/ValidationResultModal";
 export default function TicketValidator() {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
-  const { isLoading, qrResult, validationStatus, ticketNumber, isValidating, isOpen, handleClose, restartCamera } = useQRScanner();
+  const { 
+    isLoading, 
+    qrResult, 
+    validationStatus, 
+    ticketNumber, 
+    isValidating, 
+    isOpen, 
+    handleClose, 
+    restartCamera,
+    manualInput,
+    setManualInput,
+    showManualInput,
+    toggleManualInput,
+    validateManualTicket
+  } = useQRScanner();
 
   const event = events.find((event) => event.id === eventId);
 
@@ -73,9 +87,66 @@ export default function TicketValidator() {
         p={6}
         zIndex={20}
       >
-        <Button colorScheme="brand" size="lg" w="full" onClick={restartCamera} isLoading={isLoading} loadingText="Reiniciando...">
-          Reiniciar cámara
-        </Button>
+        {/* Input manual colapsable */}
+        <Collapse in={showManualInput} animateOpacity>
+          <VStack gap={3} w="full">
+            <Text color="whiteAlpha.900" fontSize="sm" textAlign="center">
+              Ingresa el código del ticket manualmente
+            </Text>
+            <HStack gap={2} w="full">
+              <Input
+                placeholder="Código del ticket"
+                value={manualInput}
+                onChange={(e) => setManualInput(e.target.value)}
+                bg="whiteAlpha.100"
+                border="1px solid"
+                borderColor="whiteAlpha.300"
+                color="whiteAlpha.900"
+                _placeholder={{ color: "whiteAlpha.600" }}
+                _focus={{ borderColor: "brand.500", boxShadow: "0 0 0 1px var(--chakra-colors-brand-500)" }}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    validateManualTicket();
+                  }
+                }}
+              />
+              <Button 
+                colorScheme="brand" 
+                onClick={validateManualTicket}
+                isLoading={isValidating}
+                loadingText="Validando..."
+                minW="100px"
+              >
+                Validar
+              </Button>
+            </HStack>
+          </VStack>
+        </Collapse>
+
+        <VStack gap={2} w="full">
+          <Button 
+            variant="outline" 
+            size="lg" 
+            w="full" 
+            onClick={toggleManualInput}
+            borderColor="whiteAlpha.300"
+            color="whiteAlpha.900"
+            _hover={{ bg: "whiteAlpha.100" }}
+          >
+            {showManualInput ? "Ocultar validación manual" : "Validación manual"}
+          </Button>
+          
+          <Button 
+            colorScheme="brand" 
+            size="lg" 
+            w="full" 
+            onClick={restartCamera} 
+            isLoading={isLoading} 
+            loadingText="Reiniciando..."
+          >
+            Reiniciar cámara
+          </Button>
+        </VStack>
       </Box>
 
       {/* Modal de resultado */}

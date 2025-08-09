@@ -7,7 +7,9 @@ export function useTicketValidation() {
   const { eventId } = useParams<{ eventId: string }>();
   const { addValidatedTicket } = useTicketStore();
 
-  const validateTicket = async (qrData: string): Promise<{ status: string; ticketNumber?: string; apiResponse: ValidateEntryOutput }> => {
+  const validateTicket = async (
+    qrData: string
+  ): Promise<{ status: string; ticketNumber?: string; message: string; apiResponse: ValidateEntryOutput }> => {
     try {
       // Llamada real a la API
       const apiResponse = await ticketService.validateEntry(qrData);
@@ -45,6 +47,7 @@ export function useTicketValidation() {
       return {
         status,
         ticketNumber: apiResponse.data?.ticketNumber,
+        message: apiResponse.message,
         apiResponse,
       };
     } catch (error) {
@@ -65,6 +68,7 @@ export function useTicketValidation() {
 
       return {
         status: "invalid",
+        message: "Error de conexión",
         apiResponse: { result: 0, message: "Error de conexión" },
       };
     }

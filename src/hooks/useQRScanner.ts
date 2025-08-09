@@ -16,6 +16,8 @@ export function useQRScanner() {
   const [ticketNumber, setTicketNumber] = useState<string | null>(null);
   const [isValidating, setIsValidating] = useState(false);
   const [scanner, setScanner] = useState<Html5QrcodeScanner | null>(null);
+  const [manualInput, setManualInput] = useState<string>("");
+  const [showManualInput, setShowManualInput] = useState(false);
 
   const createScanner = () => {
     return new Html5QrcodeScanner(
@@ -108,12 +110,54 @@ export function useQRScanner() {
     }
   };
 
+  const validateManualTicket = async () => {
+    if (!manualInput.trim()) {
+      toast({
+        title: "Error",
+        description: "Por favor ingresa un código de ticket",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    console.log("Ticket manual ingresado:", manualInput);
+
+    setQrResult(manualInput);
+    setIsValidating(true);
+    setShowManualInput(false);
+    onOpen(); // Abrir modal inmediatamente para mostrar loading
+
+    try {
+      // Validar el ticket y agregarlo al store
+      const result = await validateTicket(manualInput);
+
+      setValidationStatus(result.status);
+      setTicketNumber(result.ticketNumber || null);
+    } catch (error) {
+      console.error("Error durante la validación manual:", error);
+      setValidationStatus("invalid");
+      setTicketNumber(null);
+    } finally {
+      setIsValidating(false);
+      setManualInput(""); // Limpiar input después de validar
+    }
+  };
+
+  const toggleManualInput = () => {
+    setShowManualInput(!showManualInput);
+    setManualInput(""); // Limpiar input al abrir/cerrar
+  };
+
   const handleClose = () => {
     onClose();
     setQrResult(null);
     setValidationStatus(null);
     setTicketNumber(null);
     setIsValidating(false);
+    setShowManualInput(false);
+    setManualInput("");
 
     // Limpiar historial de duplicados después de cerrar
     setTimeout(() => {
@@ -173,5 +217,11 @@ export function useQRScanner() {
     isOpen,
     handleClose,
     restartCamera,
+    // Manual validation
+    manualInput,
+    setManualInput,
+    showManualInput,
+    toggleManualInput,
+    validateManualTicket,
   };
 }
