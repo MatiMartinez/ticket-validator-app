@@ -1,9 +1,10 @@
-import { Box, Container, VStack, Text, Card, CardBody, Badge, Divider, Alert, AlertIcon, Spinner, Center } from "@chakra-ui/react";
-import { History } from "lucide-react";
+import { Box, Container, VStack, Text, Card, CardBody, Badge, Divider, Alert, AlertIcon, Spinner, Center, HStack } from "@chakra-ui/react";
+import { History, Users, CheckCircle, Clock } from "lucide-react";
 import { useParams } from "react-router-dom";
 import { useEvents } from "../hooks/useEvents";
 import { useEventValidation } from "../hooks/useEventValidation";
 import { useTicketStatus } from "../hooks/useTicketStatus";
+import { useTicketCount } from "../hooks/useTicketCount";
 import Header from "../components/Header";
 import { formatDate } from "../utils/date";
 import QRValidatorButton from "../components/QRValidatorButton";
@@ -14,6 +15,7 @@ export default function EventValidation() {
   const { getEventById, isLoading: eventsLoading } = useEvents();
   const { validatedTickets, isLoading, error } = useEventValidation(eventId!);
   const { getStatusColor, getStatusIcon, getStatusText } = useTicketStatus();
+  const { ticketCount, isLoading: isLoadingCount, error: countError } = useTicketCount(eventId!);
 
   const event = getEventById(eventId!);
 
@@ -63,22 +65,101 @@ export default function EventValidation() {
     <Box>
       <Header title={event.name} showBackButton backToEvents />
 
-      <Container maxW="md" py={6}>
-        <VStack spacing={6} align="stretch">
+      <Container maxW="md" py={4} px={4}>
+        <VStack spacing={4} align="stretch">
           {/* Botones para iniciar validadores */}
           <VStack spacing={3} align="stretch">
             <QRValidatorButton eventId={eventId!} />
             <ManualValidatorButton eventId={eventId!} />
           </VStack>
 
-          {/* Historial */}
+          {/* Estadísticas de Tickets */}
           <Card bg="gray.800" borderColor="gray.700">
-            <CardBody>
-              <VStack spacing={4} align="stretch">
+            <CardBody p={4}>
+              <VStack spacing={3} align="stretch">
+                <Text fontSize="lg" fontWeight="bold" color="whiteAlpha.900" textAlign="center">
+                  Estadísticas del Evento
+                </Text>
+
+                {isLoadingCount ? (
+                  <Center py={4}>
+                    <VStack>
+                      <Spinner size="md" color="brand.500" />
+                      <Text fontSize="sm" color="whiteAlpha.700">
+                        Cargando estadísticas...
+                      </Text>
+                    </VStack>
+                  </Center>
+                ) : countError ? (
+                  <Alert status="error" borderRadius="md" bg="red.900" color="red.200">
+                    <AlertIcon />
+                    {countError}
+                  </Alert>
+                ) : ticketCount && ticketCount.count.length > 0 ? (
+                  <VStack spacing={3} w="full">
+                    {ticketCount.count.map((count, index) => {
+                      const pending = count.count - count.used;
+                      return (
+                        <Box key={index} w="full" p={3} bg="gray.700" borderRadius="md" border="1px" borderColor="gray.600">
+                          <Text fontSize="sm" fontWeight="medium" color="whiteAlpha.800" mb={2}>
+                            {count.type}
+                          </Text>
+                          <VStack spacing={2} w="full">
+                            <HStack justify="space-between" w="full">
+                              <HStack>
+                                <Users size={16} color="var(--chakra-colors-blue-400)" />
+                                <Text fontSize="sm" color="whiteAlpha.700">
+                                  Vendidos
+                                </Text>
+                              </HStack>
+                              <Text fontSize="sm" fontWeight="bold" color="whiteAlpha.900">
+                                {count.count}
+                              </Text>
+                            </HStack>
+                            <HStack justify="space-between" w="full">
+                              <HStack>
+                                <CheckCircle size={16} color="var(--chakra-colors-green-400)" />
+                                <Text fontSize="sm" color="whiteAlpha.700">
+                                  Ingresaron
+                                </Text>
+                              </HStack>
+                              <Text fontSize="sm" fontWeight="bold" color="whiteAlpha.900">
+                                {count.used}
+                              </Text>
+                            </HStack>
+                            <HStack justify="space-between" w="full">
+                              <HStack>
+                                <Clock size={16} color="var(--chakra-colors-orange-400)" />
+                                <Text fontSize="sm" color="whiteAlpha.700">
+                                  Por ingresar
+                                </Text>
+                              </HStack>
+                              <Text fontSize="sm" fontWeight="bold" color="whiteAlpha.900">
+                                {pending}
+                              </Text>
+                            </HStack>
+                          </VStack>
+                        </Box>
+                      );
+                    })}
+                  </VStack>
+                ) : (
+                  <Text fontSize="sm" color="whiteAlpha.600" textAlign="center">
+                    No hay datos de tickets disponibles
+                  </Text>
+                )}
+              </VStack>
+            </CardBody>
+          </Card>
+
+          {/* Últimas Validaciones */}
+          <Card bg="gray.800" borderColor="gray.700">
+            <CardBody p={4}>
+              <VStack spacing={3} align="stretch">
                 <Box display="flex" alignItems="center" gap={2}>
                   <History size={20} color="#9CA3AF" />
                   <Text fontWeight="semibold" color="whiteAlpha.900">
-                    Historial de Validaciones
+                    Últimas Validaciones
                   </Text>
                 </Box>
 
@@ -99,7 +180,7 @@ export default function EventValidation() {
                     </VStack>
                   </Center>
                 ) : (
-                  <VStack spacing={3} align="stretch" maxH="400px" overflowY="auto">
+                  <VStack spacing={2} align="stretch" maxH="300px" overflowY="auto">
                     {validatedTickets.map((ticket) => (
                       <Box key={ticket.id}>
                         <Box p={3} bg="gray.700" borderRadius="md" border="1px" borderColor="gray.600">

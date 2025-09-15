@@ -12,17 +12,17 @@ export default function TicketValidator() {
   const { eventId } = useParams<{ eventId: string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [mode, setMode] = useState<"selection" | "qr" | "manual">("selection");
+  const [mode, setMode] = useState<"qr" | "manual">("qr");
 
   const event = events.find((event) => event.id === eventId);
 
   // Initialize mode from URL search params
   useEffect(() => {
     const modeParam = searchParams.get("mode");
-    if (modeParam === "qr") {
-      setMode("qr");
-    } else if (modeParam === "manual") {
+    if (modeParam === "manual") {
       setMode("manual");
+    } else {
+      setMode("qr");
     }
   }, [searchParams]);
 
@@ -59,7 +59,7 @@ export default function TicketValidator() {
       {mode === "qr" && <QRScanner />}
 
       {/* Modo Manual */}
-      {mode === "manual" && <ManualValidator eventId={event.id} />}
+      {mode === "manual" && <ManualValidator event={event} />}
     </Box>
   );
 }

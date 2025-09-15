@@ -6,11 +6,10 @@ export interface User {
 
 export interface Event {
   id: string;
+  active: number;
   name: string;
-  description: string;
   date: string;
-  location: string;
-  imageUrl?: string;
+  ticketPrefix: string;
 }
 
 export interface ValidatedTicket {

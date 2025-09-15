@@ -1,23 +1,12 @@
-import {
-  Box,
-  Container,
-  VStack,
-  Text,
-  SimpleGrid,
-  Card,
-  CardBody,
-  Heading,
-  Button,
-  Spinner,
-  Center,
-  Alert,
-  AlertIcon,
-} from "@chakra-ui/react";
+import { Box, Container, VStack, Text, SimpleGrid, Card, CardBody, Heading, Button, Spinner, Center, Alert, AlertIcon } from "@chakra-ui/react";
 import { useEventSelection } from "../hooks/useEventSelection";
 import Header from "../components/Header";
 
 export default function EventSelection() {
   const { events, isLoading, error, handleEventSelect } = useEventSelection();
+
+  // Sort events: active first, then inactive
+  const sortedEvents = [...events].sort((a, b) => b.active - a.active);
 
   if (isLoading) {
     return (
@@ -60,7 +49,7 @@ export default function EventSelection() {
           </Box>
 
           <SimpleGrid columns={1} spacing={4}>
-            {events.map((event) => (
+            {sortedEvents.map((event) => (
               <Card
                 key={event.id}
                 bg="gray.800"
@@ -83,8 +72,15 @@ export default function EventSelection() {
                         {event.date}
                       </Text>
 
-                      <Button colorScheme="brand" size="md" w="full" onClick={() => handleEventSelect(event.id)}>
-                        Ir a Validar
+                      <Button
+                        colorScheme="brand"
+                        size="md"
+                        w="full"
+                        isDisabled={!event.active}
+                        opacity={event.active ? 1 : 0.5}
+                        onClick={() => handleEventSelect(event.id)}
+                      >
+                        {event.active ? "Ir a Validar" : "Evento Finalizado"}
                       </Button>
                     </VStack>
                   </Box>
@@ -93,7 +89,7 @@ export default function EventSelection() {
             ))}
           </SimpleGrid>
 
-          {events.length === 0 && (
+          {sortedEvents.length === 0 && (
             <Center py={12}>
               <VStack>
                 <Text color="gray.500" fontSize="lg">

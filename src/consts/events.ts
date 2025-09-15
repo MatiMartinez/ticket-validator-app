@@ -1,12 +1,18 @@
-import { Event } from '../types';
+import { Event } from "../types";
 
 export const events: Event[] = [
   {
     id: "4421cb3d-a0cf-4e29-8250-51767063cd62",
+    active: 0,
     name: "Wine Activity",
-    description: "Sunset wine & after organizado por Paax Producciones. Degustación de más de 10 bodegas, plan Bonarda, dirección de Turismo y dirección de Cultura. YO 🤍 BONARDA",
     date: "09 de Agosto, 2025 - 19:00 hs",
-    location: "Centro de congreso y exposiciones Francisco",
-    imageUrl: "/wine-activity-1.png"
-  }
+    ticketPrefix: "WIN01",
+  },
+  {
+    id: "primavera-en-el-bosque-2025",
+    active: 1,
+    name: "Primavera en el Bosque 2025",
+    date: "20 de Septiembre, 2025 - 23:00 hs",
+    ticketPrefix: "PRI01",
+  },
 ];

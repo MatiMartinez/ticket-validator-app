@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useDisclosure, useToast } from "@chakra-ui/react";
 import { ticketService } from "../services/tickets";
 import { useTicketStore } from "../store/ticketStore";
-import { ValidatedTicket } from "../types";
+import { ValidatedTicket, Event } from "../types";
 
-export function useManualValidation(eventId: string) {
+export function useManualValidation(event: Event) {
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { addValidatedTicket } = useTicketStore();
@@ -28,7 +28,7 @@ export function useManualValidation(eventId: string) {
     }
 
     // Construir el código completo con el prefijo
-    const fullTicketCode = `WIN01-${manualInput}`;
+    const fullTicketCode = `${event.ticketPrefix}-${manualInput}`;
 
     setValidationResult(fullTicketCode);
     setIsValidating(true);
@@ -46,7 +46,7 @@ export function useManualValidation(eventId: string) {
         const validatedTicket: ValidatedTicket = {
           id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           ticketId: fullTicketCode,
-          eventId: eventId,
+          eventId: event.id,
           validatedAt: new Date().toISOString(),
           validatedBy: "manual-validator",
           status: "valid",

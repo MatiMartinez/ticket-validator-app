@@ -1,19 +1,11 @@
 import { Center, VStack, Text, Input, Button } from "@chakra-ui/react";
 import { useManualValidation } from "../hooks/useManualValidation";
 import ValidationResultModal from "./ValidationResultModal";
+import { Event } from "../types";
 
-export default function ManualValidator({ eventId }: { eventId: string }) {
-  const {
-    manualInput,
-    setManualInput,
-    validationResult,
-    validationStatus,
-    validationMessage,
-    isValidating,
-    isOpen,
-    validateManualTicket,
-    handleClose,
-  } = useManualValidation(eventId);
+export default function ManualValidator({ event }: { event: Event }) {
+  const { manualInput, setManualInput, validationResult, validationStatus, validationMessage, isValidating, isOpen, validateManualTicket, handleClose } =
+    useManualValidation(event);
 
   return (
     <>
@@ -28,12 +20,12 @@ export default function ManualValidator({ eventId }: { eventId: string }) {
 
           <VStack gap={4} w="full">
             <Input
-              placeholder="WIN01-XXXXXXXX"
-              value={`WIN01-${manualInput}`}
+              placeholder={`${event.ticketPrefix}-XXXXXXXX`}
+              value={`${event.ticketPrefix}-${manualInput}`}
               onChange={(e) => {
                 const value = e.target.value;
-                if (value.startsWith("WIN01-")) {
-                  setManualInput(value.slice(6).toUpperCase());
+                if (value.startsWith(`${event.ticketPrefix}-`)) {
+                  setManualInput(value.slice(event.ticketPrefix.length + 1).toUpperCase());
                 } else {
                   setManualInput("");
                 }
