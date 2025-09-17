@@ -13,6 +13,6 @@ export const events: Event[] = [
     active: 1,
     name: "Primavera en el Bosque 2025",
     date: "20 de Septiembre, 2025 - 23:00 hs",
-    ticketPrefix: "PRI01",
+    ticketPrefix: "PEE01",
   },
 ];
