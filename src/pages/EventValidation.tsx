@@ -69,8 +69,14 @@ export default function EventValidation() {
         <VStack spacing={4} align="stretch">
           {/* Botones para iniciar validadores */}
           <VStack spacing={3} align="stretch">
-            <QRValidatorButton eventId={eventId!} />
-            <ManualValidatorButton eventId={eventId!} />
+            {!event.active && (
+              <Alert status="info" borderRadius="md" bg="blue.900" color="blue.200">
+                <AlertIcon />
+                Este evento no está disponible. Solo puedes ver las estadísticas de ventas.
+              </Alert>
+            )}
+            <QRValidatorButton eventId={eventId!} isDisabled={!event.active} />
+            <ManualValidatorButton eventId={eventId!} isDisabled={!event.active} />
           </VStack>
 
           {/* Estadísticas de Tickets */}

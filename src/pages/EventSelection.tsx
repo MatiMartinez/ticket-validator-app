@@ -72,15 +72,8 @@ export default function EventSelection() {
                         {event.date}
                       </Text>
 
-                      <Button
-                        colorScheme="brand"
-                        size="md"
-                        w="full"
-                        isDisabled={!event.active}
-                        opacity={event.active ? 1 : 0.5}
-                        onClick={() => handleEventSelect(event.id)}
-                      >
-                        {event.active ? "Ir a Validar" : "Evento Finalizado"}
+                      <Button colorScheme={event.active ? "brand" : "gray"} size="md" w="full" onClick={() => handleEventSelect(event.id)}>
+                        {event.active ? "Ir a Validar" : "Ver Estadísticas"}
                       </Button>
                     </VStack>
                   </Box>
