@@ -10,7 +10,7 @@ export const events: Event[] = [
   },
   {
     id: "primavera-en-el-bosque-2025",
-    active: 0,
+    active: 1,
     name: "Primavera en el Bosque 2025",
     date: "20 de Septiembre, 2025 - 23:00 hs",
     ticketPrefix: "PEE01",
